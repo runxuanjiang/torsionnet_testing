@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import torch
 
 from torsionnet.utils import *
@@ -25,7 +24,7 @@ def ppo_feature(tag, model):
     config.rollout_length = 2
     config.recurrence = 1
     config.optimization_epochs = 1
-    config.max_steps = 30
+    config.max_steps = 24
     config.save_interval = 8
     config.eval_interval = 8
     config.eval_episodes = 3
@@ -43,14 +42,16 @@ def ppo_feature(tag, model):
     config.ppo_ratio_clip = 0.2
 
     # Task Settings
-    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=random.randint(0,1e5), mol_config=DIFF, max_steps=4)
-    config.eval_env = Task('ConfEnv-v1', seed=random.randint(0,7e4), mol_config=DIFF, max_steps=20)
+    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=DIFF, max_steps=4)
+    config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=DIFF, max_steps=20)
     config.curriculum = None
 
     return PPORecurrentAgent(config)
 
 
 if __name__ == '__main__':
+    np.random.seed(0)
+    torch.manual_seed(0)
     nnet = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     nnet.to(device)
     set_one_thread()
