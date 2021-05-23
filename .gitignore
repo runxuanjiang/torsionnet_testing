@@ -3,6 +3,7 @@ data/
 model_data
 train_data
 molecule_data
+*.log
 
 
 #python utility files

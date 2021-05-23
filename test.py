@@ -11,7 +11,11 @@ from torsionnet.generate_molecule import DIFF
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+import logging
+logging.basicConfig(filename='out1.log', level=logging.DEBUG)
+
 def ppo_feature(tag, model):
+    mol_config = DIFF()
     config = Config()
     config.tag = tag
 
@@ -42,8 +46,8 @@ def ppo_feature(tag, model):
     config.ppo_ratio_clip = 0.2
 
     # Task Settings
-    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=DIFF, max_steps=4)
-    config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=DIFF, max_steps=20)
+    config.train_env = Task('ConfEnv-v3', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
+    config.eval_env = Task('ConfEnv-v3', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
     config.curriculum = None
 
     return PPORecurrentAgent(config)
