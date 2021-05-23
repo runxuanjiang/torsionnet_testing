@@ -7,15 +7,15 @@ from torsionnet.config import Config
 from torsionnet.environments import Task
 from torsionnet.models import RTGNBatch
 
-from torsionnet.generate_molecule import DIFF
+from torsionnet.generate_molecule import DIFF, DiffV2
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 import logging
-logging.basicConfig(filename='out1.log', level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 def ppo_feature(tag, model):
-    mol_config = DIFF()
+    mol_config = DiffV2()
     config = Config()
     config.tag = tag
 
@@ -46,16 +46,14 @@ def ppo_feature(tag, model):
     config.ppo_ratio_clip = 0.2
 
     # Task Settings
-    config.train_env = Task('ConfEnv-v3', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
-    config.eval_env = Task('ConfEnv-v3', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
+    config.train_env = Task('ConfEnv-v1', concurrency=True, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
+    config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
     config.curriculum = None
 
     return PPORecurrentAgent(config)
 
 
 if __name__ == '__main__':
-    np.random.seed(0)
-    torch.manual_seed(0)
     nnet = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     nnet.to(device)
     set_one_thread()
