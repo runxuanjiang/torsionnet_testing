@@ -5,7 +5,7 @@ from torsionnet.utils import *
 from torsionnet.agents import PPORecurrentAgent
 from torsionnet.config import Config
 from torsionnet.environments import Task
-from torsionnet.models import RTGNBatch
+from torsionnet.models import RTGNRecurrent
 
 from torsionnet.generate_molecule import DIFF, DiffV2
 
@@ -28,9 +28,9 @@ def ppo_feature(tag, model):
     config.rollout_length = 2
     config.recurrence = 1
     config.optimization_epochs = 1
-    config.max_steps = 24
+    config.max_steps = 16
     config.save_interval = 8
-    config.eval_interval = 8
+    config.eval_interval = 0
     config.eval_episodes = 3
     config.mini_batch_size = 4
 
@@ -46,7 +46,7 @@ def ppo_feature(tag, model):
     config.ppo_ratio_clip = 0.2
 
     # Task Settings
-    config.train_env = Task('ConfEnv-v1', concurrency=True, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
+    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
     config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
     config.curriculum = None
 
@@ -54,7 +54,9 @@ def ppo_feature(tag, model):
 
 
 if __name__ == '__main__':
-    nnet = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
+    np.random.seed(0)
+    torch.manual_seed(0)
+    nnet = RTGNRecurrent(6, 128, edge_dim=6, point_dim=5)
     nnet.to(device)
     set_one_thread()
     tag = 'TEST'

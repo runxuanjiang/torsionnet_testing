@@ -3,7 +3,7 @@ import random
 import torch
 
 from torsionnet.utils import *
-from torsionnet.agents import PPORecurrentAgent
+from torsionnet.agents import A2CRecurrentAgent
 from torsionnet.config import Config
 from torsionnet.environments import Task
 from torsionnet.models import RTGNRecurrent
@@ -25,18 +25,16 @@ def ppo_feature(tag, model):
     config.hidden_size = model.dim
 
     # Batch Hyperparameters
-    config.num_workers = 20
-    config.rollout_length = 20
+    config.num_workers = 3
+    config.rollout_length = 5
     config.recurrence = 5
-    config.optimization_epochs = 4
     config.max_steps = 10000000
     config.save_interval = config.num_workers*200*5
     config.eval_interval = config.num_workers*200*5
     config.eval_episodes = 2
-    config.mini_batch_size = 50
 
     # Coefficient Hyperparameters
-    lr = 5e-6 * np.sqrt(config.num_workers)
+    lr = 5e-5 * np.sqrt(config.num_workers)
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
     config.discount = 0.9999
     config.use_gae = True
@@ -51,13 +49,13 @@ def ppo_feature(tag, model):
     config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=200)
     config.curriculum = None
 
-    return PPORecurrentAgent(config)
+    return A2CRecurrentAgent(config)
 
 
 if __name__ == '__main__':
     nnet = RTGNRecurrent(6, 128, edge_dim=6, point_dim=5)
     nnet.to(device)
     set_one_thread()
-    tag = 'Diff-test_v0'
+    tag = 'Diff-a2c_v0'
     agent = ppo_feature(tag=tag, model=nnet)
     agent.run_steps()

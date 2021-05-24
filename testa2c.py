@@ -1,19 +1,18 @@
 import numpy as np
-import random
 import torch
 
 from torsionnet.utils import *
-from torsionnet.agents import PPORecurrentAgent
+from torsionnet.agents import A2CRecurrentAgent
 from torsionnet.config import Config
 from torsionnet.environments import Task
-from torsionnet.models import RTGNRecurrent
+from torsionnet.models import RTGNBatch
 
-from torsionnet.generate_molecule import DiffV2
+from torsionnet.generate_molecule import DIFF, DiffV2
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def ppo_feature(tag, model):
     mol_config = DiffV2()
@@ -25,15 +24,15 @@ def ppo_feature(tag, model):
     config.hidden_size = model.dim
 
     # Batch Hyperparameters
-    config.num_workers = 20
-    config.rollout_length = 20
-    config.recurrence = 5
-    config.optimization_epochs = 4
-    config.max_steps = 10000000
-    config.save_interval = config.num_workers*200*5
-    config.eval_interval = config.num_workers*200*5
-    config.eval_episodes = 2
-    config.mini_batch_size = 50
+    config.num_workers = 2
+    config.rollout_length = 2
+    config.recurrence = 1
+    config.optimization_epochs = 1
+    config.max_steps = 16
+    config.save_interval = 8
+    config.eval_interval = 0
+    config.eval_episodes = 3
+    config.mini_batch_size = 4
 
     # Coefficient Hyperparameters
     lr = 5e-6 * np.sqrt(config.num_workers)
@@ -47,17 +46,19 @@ def ppo_feature(tag, model):
     config.ppo_ratio_clip = 0.2
 
     # Task Settings
-    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=200)
-    config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=200)
+    config.train_env = Task('ConfEnv-v1', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
+    config.eval_env = Task('ConfEnv-v1', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
     config.curriculum = None
 
-    return PPORecurrentAgent(config)
+    return A2CRecurrentAgent(config)
 
 
 if __name__ == '__main__':
-    nnet = RTGNRecurrent(6, 128, edge_dim=6, point_dim=5)
+    np.random.seed(0)
+    torch.manual_seed(0)
+    nnet = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     nnet.to(device)
     set_one_thread()
-    tag = 'Diff-test_v0'
+    tag = 'TEST'
     agent = ppo_feature(tag=tag, model=nnet)
     agent.run_steps()
