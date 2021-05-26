@@ -3,7 +3,7 @@
 
 #“#SBATCH” directives that convey submission options:
 
-#SBATCH --job-name=testing
+#SBATCH --job-name=example2
 #SBATCH --mail-user=runxuanj@umich.edu
 #SBATCH --cpus-per-task=20
 #SBATCH --gres=gpu:1
@@ -16,4 +16,4 @@
 
 # The application(s) to execute along with its input arguments and options:
 conda activate my-rdkit-env
-python -u test.py
+python -u example2.py

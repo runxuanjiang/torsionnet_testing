@@ -5,7 +5,7 @@ from torsionnet import utils
 from torsionnet.agents import PPORecurrentAgent
 from torsionnet.config import Config
 from torsionnet.environments import Task
-from torsionnet.models import RTGNRecurrent, RTGNGatRecurrent
+from torsionnet.models import RTGNRecurrent
 
 from torsionnet.molecules import test_alkane
 
@@ -21,26 +21,25 @@ if __name__ == '__main__':
 
     config = Config()
     config.tag = 'example1'
-    # config.network = RTGNRecurrent(6, 128, edge_dim=6, node_dim=5).to(device)
-    config.network = RTGNGatRecurrent(6, 128, node_dim=5).to(device)
+    config.network = RTGNRecurrent(6, 128, edge_dim=6, point_dim=5).to(device)
     # Batch Hyperparameters
-    config.num_workers = 2
-    config.rollout_length = 2
-    config.recurrence = 1
-    config.optimization_epochs = 1
-    config.max_steps = 24
-    config.save_interval = 8
-    config.eval_interval = 0
-    config.eval_episodes = 1
-    config.mini_batch_size = 4
+    config.num_workers = 20
+    config.rollout_length = 20
+    config.recurrence = 5
+    config.optimization_epochs = 4
+    config.max_steps = 10000000
+    config.save_interval = config.num_workers*200*5
+    config.eval_interval = config.num_workers*200*5
+    config.eval_episodes = 2
+    config.mini_batch_size = 50
 
     # Coefficient Hyperparameters
     lr = 5e-6 * np.sqrt(config.num_workers)
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
 
     # Task Settings
-    config.train_env = Task('GibbsScorePruningEnv-v0', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
-    config.eval_env = Task('GibbsScorePruningEnv-v0', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
+    config.train_env = Task('GibbsScorePruningEnv-v0', concurrency=True, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=200)
+    config.eval_env = Task('GibbsScorePruningEnv-v0', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=200)
     config.curriculum = None
 
     agent = PPORecurrentAgent(config)
