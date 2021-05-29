@@ -30,7 +30,7 @@ if __name__ == '__main__':
     config.optimization_epochs = 1
     config.max_steps = 24
     config.save_interval = 8
-    config.eval_interval = 0
+    config.eval_interval = 8
     config.eval_episodes = 1
     config.mini_batch_size = 4
 
