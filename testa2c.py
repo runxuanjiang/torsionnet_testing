@@ -1,13 +1,13 @@
 import numpy as np
 import torch
 
-from torsionnet import utils
-from torsionnet.agents import A2CRecurrentAgent, A2CAgent
-from torsionnet.config import Config
-from torsionnet.environments import Task
-from torsionnet.models import RTGNRecurrent, RTGN, RTGNGat
+from conformer_rl import utils
+from conformer_rl.agents import A2CRecurrentAgent, A2CAgent
+from conformer_rl.config import Config
+from conformer_rl.environments import Task
+from conformer_rl.models import RTGNRecurrent, RTGN, RTGNGat
 
-from torsionnet.molecules import test_alkane
+from conformer_rl.molecules import test_alkane
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
