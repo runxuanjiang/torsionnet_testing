@@ -1,13 +1,13 @@
 import numpy as np
 import torch
 
-from torsionnet import utils
-from torsionnet.agents import A2CAgent
-from torsionnet.config import Config
-from torsionnet.environments import Task
-from torsionnet.models import RTGN
+from conformer_rl import utils
+from conformer_rl.agents import A2CAgent
+from conformer_rl.config import Config
+from conformer_rl.environments import Task
+from conformer_rl.models import RTGN
 
-from torsionnet.molecules import test_alkane
+from conformer_rl.molecule_generation import test_alkane
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     config = Config()
     config.tag = 'example4'
-    config.network = RTGN(6, 128, edge_dim=6, point_dim=5).to(device)
+    config.network = RTGN(6, 128, edge_dim=6, node_dim=5).to(device)
     # Batch Hyperparameters
     config.num_workers = 10
     config.rollout_length = 5

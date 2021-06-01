@@ -7,7 +7,7 @@ from conformer_rl.config import Config
 from conformer_rl.environments import Task
 from conformer_rl.models import RTGNRecurrent, RTGN, RTGNGat
 
-from conformer_rl.molecules import test_alkane
+from conformer_rl.molecule_generation import xorgate
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)
 if __name__ == '__main__':
     utils.set_one_thread()
 
-    mol_config = test_alkane()
+    mol_config = xorgate(2, 3)
 
     config = Config()
     config.tag = 'example1'

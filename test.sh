@@ -15,4 +15,4 @@
 
 # The application(s) to execute along with its input arguments and options:
 conda activate my-rdkit-env
-python -u test.py
+python -u testa2c.py
