@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --time=2:00:00
-#SBATCH --account=tewaria1
+#SBATCH --account=tewaria0
 #SBATCH --partition=gpu
 #SBATCH --output=/home/%u/%x-%j.log
 #SBATCH --get-user-env
