@@ -8,12 +8,14 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
-#SBATCH --time=2:00:00
+#SBATCH --time=20:00:00
 #SBATCH --account=tewaria0
 #SBATCH --partition=gpu
 #SBATCH --output=/home/%u/%x-%j.log
 #SBATCH --get-user-env
 
 # The application(s) to execute along with its input arguments and options:
-conda activate my-rdkit-env
+source /home/${USER}/.bashrc
+module load gcc/9.2.0
+conda activate rl-pip
 python -u example1.py

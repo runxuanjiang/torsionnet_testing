@@ -4,6 +4,7 @@ model_data
 train_data
 molecule_data
 *.log
+*.pkl
 
 
 #python utility files

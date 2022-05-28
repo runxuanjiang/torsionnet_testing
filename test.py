@@ -1,13 +1,16 @@
 import numpy as np
 import torch
+import pickle
 
 from conformer_rl import utils
 from conformer_rl.agents import PPORecurrentAgent
 from conformer_rl.config import Config
 from conformer_rl.environments import Task
-from conformer_rl.models import RTGNRecurrent, RTGNGatRecurrent
+from conformer_rl.models import RTGNRecurrent
 
-from conformer_rl.molecule_generation import test_alkane, lignin
+
+from conformer_rl.molecule_generation.generate_alkanes import generate_branched_alkane
+from conformer_rl.molecule_generation.generate_molecule_config import config_from_rdkit
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -17,14 +20,15 @@ logging.basicConfig(level=logging.DEBUG)
 if __name__ == '__main__':
     utils.set_one_thread()
 
-    mol_config = lignin(2)
+    # mol_config = config_from_rdkit(generate_branched_alkane(10), save_file='10_alkane')
+    with open('10_alkane.pkl', 'rb') as file:
+        mol_config = pickle.load(file)
 
     config = Config()
     config.tag = 'example1'
     # config.network = RTGNRecurrent(6, 128, edge_dim=6, node_dim=5).to(device)
-    config.network = RTGNGatRecurrent(6, 128, node_dim=5).to(device)
+    config.network = RTGNRecurrent(6, 128, edge_dim=6, node_dim=5).to(device)
     # Batch Hyperparameters
-    config.num_workers = 2
     config.rollout_length = 2
     config.recurrence = 1
     config.optimization_epochs = 1
@@ -34,12 +38,13 @@ if __name__ == '__main__':
     config.eval_episodes = 1
     config.mini_batch_size = 4
 
+
     # Coefficient Hyperparameters
-    lr = 5e-6 * np.sqrt(config.num_workers)
+    lr = 5e-6 * np.sqrt(2)
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
 
     # Task Settings
-    config.train_env = Task('GibbsScorePruningEnv-v0', concurrency=False, num_envs=config.num_workers, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
+    config.train_env = Task('GibbsScoreEnv-v0', concurrency=True, num_envs=2, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
     config.eval_env = Task('GibbsScorePruningEnv-v0', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
     config.curriculum = None
 
