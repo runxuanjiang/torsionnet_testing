@@ -13,14 +13,14 @@ from conformer_rl.molecule_generation.generate_alkanes import generate_branched_
 from conformer_rl.molecule_generation.generate_molecule_config import config_from_rdkit
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+                                                                                                                                                                                                     
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == '__main__':
     utils.set_one_thread()
 
-    # mol_config = config_from_rdkit(generate_branched_alkane(10), save_file='10_alkane')
+    mol_config = config_from_rdkit(generate_branched_alkane(10), num_conformers=4, calc_normalizers=True, save_file='10_alkane')
     with open('10_alkane.pkl', 'rb') as file:
         mol_config = pickle.load(file)
 
@@ -44,8 +44,8 @@ if __name__ == '__main__':
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
 
     # Task Settings
-    config.train_env = Task('GibbsScoreEnv-v0', concurrency=True, num_envs=2, seed=np.random.randint(0,1e5), mol_config=mol_config, max_steps=4)
-    config.eval_env = Task('GibbsScorePruningEnv-v0', seed=np.random.randint(0,7e4), mol_config=mol_config, max_steps=20)
+    config.train_env = Task('GibbsScoreEnv-v0', concurrency=True, num_envs=2, seed=np.random.randint(0,1e5), mol_config=mol_config)
+    config.eval_env = Task('GibbsScorePruningEnv-v0', seed=np.random.randint(0,7e4), mol_config=mol_config)
     config.curriculum = None
 
     agent = PPORecurrentAgent(config)
