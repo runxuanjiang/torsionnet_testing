@@ -3,7 +3,7 @@
 
 #“#SBATCH” directives that convey submission options:
 
-#SBATCH --job-name=example2
+#SBATCH --job-name=example3
 #SBATCH --mail-user=runxuanj@umich.edu
 #SBATCH --cpus-per-task=10
 #SBATCH --gres=gpu:1
@@ -18,4 +18,4 @@
 source /home/${USER}/.bashrc
 module load gcc/9.2.0
 conda activate rl-pip
-python -u example2.py
+python -u example3.py

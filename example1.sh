@@ -5,7 +5,7 @@
 
 #SBATCH --job-name=example1
 #SBATCH --mail-user=runxuanj@umich.edu
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=5
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --time=20:00:00
